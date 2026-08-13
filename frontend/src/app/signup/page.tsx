@@ -80,14 +80,14 @@ export default function SignupPage() {
   return (
     <PageTransition>
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-12">
-        <div className="w-full max-w-md p-8 bg-white border-2 border-[#e5e5e5] rounded-2xl">
-          <h1 className="mb-6 text-3xl font-bold text-center text-[#3c3c3c]">
+        <div className="w-full max-w-md p-8 bg-[#182830] border-2 border-[#2b3d47] rounded-3xl shadow-xl">
+          <h1 className="mb-6 text-3xl font-black text-center text-white">
             Create your profile
           </h1>
 
           {error && (
             <div
-              className="mb-6 p-4 text-sm font-bold text-white bg-[#ff4b4b] rounded-xl"
+              className="mb-6 p-4 text-sm font-extrabold text-white bg-[#ff4b4b] rounded-2xl border border-[#ea2b2b]"
               role="alert"
               aria-live="polite"
             >
@@ -96,8 +96,8 @@ export default function SignupPage() {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="username" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="username" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Username
               </label>
               <input
@@ -108,12 +108,12 @@ export default function SignupPage() {
                 placeholder="e.g. duolingo_fan_99"
                 required
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="email" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="email" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Email
               </label>
               <input
@@ -124,12 +124,12 @@ export default function SignupPage() {
                 placeholder="Email address"
                 required
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="displayName" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="displayName" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Display Name (Optional)
               </label>
               <input
@@ -139,12 +139,12 @@ export default function SignupPage() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="What should we call you?"
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="password" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Password
               </label>
               <input
@@ -156,12 +156,12 @@ export default function SignupPage() {
                 required
                 minLength={8}
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="confirmPassword" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="confirmPassword" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Confirm Password
               </label>
               <input
@@ -173,14 +173,14 @@ export default function SignupPage() {
                 required
                 minLength={8}
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
             <Button
               type="submit"
               size="lg"
-              className="w-full mt-4"
+              className="w-full mt-4 bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#3b8701] active:border-b-0 text-white font-black text-sm uppercase tracking-wider rounded-2xl"
               disabled={isSubmitting || !username || !email || !password || !confirmPassword}
             >
               CREATE ACCOUNT
@@ -190,7 +190,7 @@ export default function SignupPage() {
           <div className="mt-8 text-center">
             <Link
               href="/login"
-              className="text-sm font-bold text-[#1cb0f6] hover:text-[#1899d6] uppercase tracking-wide"
+              className="text-xs font-black text-[#1cb0f6] hover:text-[#84d8ff] uppercase tracking-wider"
             >
               ALREADY HAVE AN ACCOUNT? LOG IN
             </Link>

@@ -1,7 +1,11 @@
+"use client";
+
 import * as React from "react";
 import { LearningPathUnit, LearningPathSkill } from "@/types/api";
 import { SkillNode } from "./SkillNode";
 import { PathConnector } from "./PathConnector";
+import { Mascot } from "@/components/illustrations/Mascot";
+import { BookOpen } from "lucide-react";
 
 export interface UnitSectionProps {
   unit: LearningPathUnit;
@@ -14,20 +18,32 @@ export function UnitSection({ unit, onSkillClick, index }: UnitSectionProps) {
   const bgColor = bgColors[index % bgColors.length];
   
   return (
-    <section className="relative w-full mb-8">
-      {/* Unit Header Header */}
-      <div className={`w-full rounded-3xl p-5 md:p-6 text-white ${bgColor} shadow-lg mb-6`}>
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black">Unit {unit.order_index}</h2>
-            <p className="text-sm md:text-base font-extrabold opacity-95">{unit.title}</p>
-            {unit.description && <p className="text-sm mt-1 opacity-85 font-bold">{unit.description}</p>}
+    <section className="relative w-full mb-10">
+      {/* Unit Header (Matching Attached Reference Screenshot 5) */}
+      <div className={`w-full rounded-3xl p-6 text-white ${bgColor} shadow-xl mb-8 relative overflow-hidden`}>
+        <div className="flex items-center justify-between gap-4 z-10 relative">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-black tracking-widest uppercase opacity-90">
+              SECTION 1, UNIT {unit.order_index}
+            </span>
+            <h2 className="text-xl md:text-2xl font-black">{unit.title}</h2>
+            {unit.description && <p className="text-sm mt-1 font-bold opacity-90">{unit.description}</p>}
           </div>
+
+          <button className="flex items-center gap-2 px-4 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl text-xs font-black tracking-wider uppercase border border-white/40 transition-all shrink-0 cursor-pointer">
+            <BookOpen className="h-4 w-4" />
+            <span>GUIDEBOOK</span>
+          </button>
         </div>
       </div>
       
       {/* Skills Path */}
-      <div className="flex flex-col items-center py-6 w-full max-w-sm mx-auto">
+      <div className="relative flex flex-col items-center py-6 w-full max-w-sm mx-auto">
+        {/* Mascot standing beside path */}
+        <div className="absolute right-[-40px] top-12 hidden md:block">
+          <Mascot variant="happy" className="h-32 w-32" />
+        </div>
+
         {unit.skills.map((skill, i) => {
           const cycle = i % 8;
           const nextCycle = (i + 1) % 8;

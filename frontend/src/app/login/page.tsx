@@ -47,14 +47,14 @@ export default function LoginPage() {
   return (
     <PageTransition>
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-12">
-        <div className="w-full max-w-md p-8 bg-white border-2 border-[#e5e5e5] rounded-2xl">
-          <h1 className="mb-6 text-3xl font-bold text-center text-[#3c3c3c]">
+        <div className="w-full max-w-md p-8 bg-[#182830] border-2 border-[#2b3d47] rounded-3xl shadow-xl">
+          <h1 className="mb-6 text-3xl font-black text-center text-white">
             Log in
           </h1>
 
           {error && (
             <div
-              className="mb-6 p-4 text-sm font-bold text-white bg-[#ff4b4b] rounded-xl"
+              className="mb-6 p-4 text-sm font-extrabold text-white bg-[#ff4b4b] rounded-2xl border border-[#ea2b2b]"
               role="alert"
               aria-live="polite"
             >
@@ -63,8 +63,8 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="identifier" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="identifier" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Username or Email
               </label>
               <input
@@ -75,12 +75,12 @@ export default function LoginPage() {
                 placeholder="Username or email"
                 required
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="password" className="text-sm font-bold text-[#777777]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-xs font-black uppercase text-[#afafaf] tracking-wider">
                 Password
               </label>
               <input
@@ -91,14 +91,14 @@ export default function LoginPage() {
                 placeholder="Password"
                 required
                 disabled={isSubmitting}
-                className="w-full p-4 border-2 border-[#e5e5e5] rounded-xl font-bold text-[#3c3c3c] bg-[#f7f7f7] focus:border-[#1cb0f6] focus:bg-white transition-colors outline-none"
+                className="w-full p-4 border-2 border-[#2b3d47] rounded-2xl font-bold text-white bg-[#131f24] focus:border-[#1cb0f6] transition-colors outline-none"
               />
             </div>
 
             <Button
               type="submit"
               size="lg"
-              className="w-full mt-4"
+              className="w-full mt-4 bg-[#1cb0f6] hover:bg-[#1899d6] border-b-4 border-[#0081c9] active:border-b-0 text-white font-black text-sm uppercase tracking-wider rounded-2xl"
               disabled={isSubmitting || !identifier || !password}
             >
               LOG IN
@@ -108,7 +108,7 @@ export default function LoginPage() {
           <div className="mt-8 text-center">
             <Link
               href="/signup"
-              className="text-sm font-bold text-[#1cb0f6] hover:text-[#1899d6] uppercase tracking-wide"
+              className="text-xs font-black text-[#1cb0f6] hover:text-[#84d8ff] uppercase tracking-wider"
             >
               DON&apos;T HAVE AN ACCOUNT? SIGN UP
             </Link>

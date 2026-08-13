@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { PageTransition } from "@/components/motion/PageTransition";
-import { Card } from "@/components/ui/Card";
-import { User, Flame } from "lucide-react";
+import { RightDashboard } from "@/components/layout/RightDashboard";
+import { User, Flame, Trophy, Shield } from "lucide-react";
 import { api } from "@/lib/api";
 import type { LeaderboardResponse, LeaderboardEntry } from "@/types/api";
 import { useAuth } from "@/context/AuthContext";
@@ -36,80 +36,85 @@ export default function LeaderboardPage() {
     return () => window.removeEventListener("sync-user-stats", handleSync);
   }, [fetchLeaderboard]);
 
-  if (loading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e5e5e5] border-t-[#1cb0f6]"></div>
-      </div>
-    );
-  }
-
-  if (!data) return null;
-
-  const top3 = data.entries.slice(0, 3);
-  const others = data.entries.slice(3);
-  const currentUserEntry = data.entries.find(e => e.user_id === user?.id);
-  const isCurrentUserInOthers = others.some(e => e.user_id === user?.id);
-  const showStickyUser = currentUserEntry && !isCurrentUserInOthers && data.current_user_rank && data.current_user_rank > 3;
-
   return (
     <ProtectedRoute>
       <PageTransition>
-      <div className="flex flex-col gap-6 py-8 pb-32">
-        <h1 className="text-2xl font-bold uppercase tracking-wide border-b-2 border-[#e5e5e5] pb-4">
-          Leaderboard
-        </h1>
-        
-        <div className="flex flex-col gap-2">
-          {/* Top 3 */}
-          {top3.map((entry) => (
-            <LeaderboardRow key={entry.user_id} entry={entry} isCurrentUser={entry.user_id === user?.id} />
-          ))}
+        <div className="flex flex-col lg:flex-row gap-8 w-full items-start py-4 md:py-6">
+          {/* Main Column */}
+          <div className="flex-1 w-full max-w-2xl flex flex-col gap-6">
+            {/* Header Card */}
+            <div className="bg-[#182830] border-2 border-[#2b3d47] rounded-3xl p-6 flex items-center justify-between shadow-xl">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-2xl md:text-3xl font-black text-white">Bronze League</h1>
+                <p className="text-xs font-bold text-[#afafaf]">Top 3 advance to the next league!</p>
+              </div>
+              <Trophy className="h-12 w-12 text-[#ffc800]" />
+            </div>
 
-          {/* Spacer if there are others */}
-          {others.length > 0 && <div className="h-4"></div>}
+            {loading ? (
+              <div className="flex flex-col gap-3 animate-pulse">
+                <div className="h-16 bg-[#182830] rounded-2xl"></div>
+                <div className="h-16 bg-[#182830] rounded-2xl"></div>
+              </div>
+            ) : data ? (
+              <div className="flex flex-col gap-2.5">
+                {data.entries.map((entry) => (
+                  <LeaderboardRow
+                    key={entry.user_id}
+                    entry={entry}
+                    isCurrentUser={entry.user_id === user?.id}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 p-4 rounded-3xl bg-[#182830] border-2 border-[#2b3d47] text-sm font-bold text-[#afafaf]">
+                <Shield className="h-6 w-6 text-[#afafaf]" />
+                <span>Leaderboard data unavailable</span>
+              </div>
+            )}
+          </div>
 
-          {/* Others */}
-          {others.map((entry) => (
-            <LeaderboardRow key={entry.user_id} entry={entry} isCurrentUser={entry.user_id === user?.id} />
-          ))}
-
-          {/* Sticky Current User if they are completely hidden (not possible with 5 users, but good for completeness) */}
-          {showStickyUser && (
-            <>
-              <div className="flex justify-center py-2 text-[#afafaf] font-bold">...</div>
-              <LeaderboardRow entry={currentUserEntry!} isCurrentUser={true} />
-            </>
-          )}
+          {/* Right Dashboard Column */}
+          <RightDashboard />
         </div>
-      </div>
-    </PageTransition>
+      </PageTransition>
     </ProtectedRoute>
   );
 }
 
 function LeaderboardRow({ entry, isCurrentUser }: { entry: LeaderboardEntry, isCurrentUser: boolean }) {
-  let rankColor = "text-[#afafaf]";
+  let rankColor = "text-[#5f7582]";
   if (entry.rank === 1) rankColor = "text-[#ffc800]";
-  else if (entry.rank === 2) rankColor = "text-[#ce82ff]";
-  else if (entry.rank === 3) rankColor = "text-[#ff9600]";
+  else if (entry.rank === 2) rankColor = "text-[#e5e5e5]";
+  else if (entry.rank === 3) rankColor = "text-[#cd7f32]";
 
   return (
-    <Card padding="sm" className={`flex items-center gap-4 ${isCurrentUser ? "bg-[#e5e5e5]/50 border-[#1cb0f6]" : ""}`}>
-      <div className={`w-8 text-center font-bold text-lg ${rankColor}`}>
-        {entry.rank}
+    <div
+      className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
+        isCurrentUser
+          ? "bg-[#182830] border-[#1cb0f6] shadow-[0_0_12px_rgba(28,176,246,0.2)]"
+          : "bg-[#182830]/80 border-[#2b3d47]"
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        <span className={`w-8 text-center font-black text-lg ${rankColor}`}>
+          {entry.rank}
+        </span>
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1cb0f6] text-white border-2 border-[#2b3d47]">
+          <User className="h-6 w-6" />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-extrabold text-base text-white">
+            {entry.display_name} {isCurrentUser && "(You)"}
+          </span>
+          <span className="text-xs font-bold text-[#1cb0f6]">{entry.xp} XP</span>
+        </div>
       </div>
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1cb0f6] text-white">
-        <User className="h-6 w-6" />
+
+      <div className="flex items-center gap-1.5 font-extrabold text-xs text-[#ff9600]">
+        <Flame className="h-4 w-4 fill-current" />
+        <span>{entry.streak}</span>
       </div>
-      <div className="flex flex-1 flex-col">
-        <span className="font-bold text-lg">{entry.display_name} {isCurrentUser && "(You)"}</span>
-        <span className="text-sm font-bold text-[#afafaf]">{entry.xp} XP</span>
-      </div>
-      <div className="hidden sm:flex items-center gap-1 font-bold text-[#ff9600]">
-        <Flame className="h-5 w-5" />
-        {entry.streak}
-      </div>
-    </Card>
+    </div>
   );
 }

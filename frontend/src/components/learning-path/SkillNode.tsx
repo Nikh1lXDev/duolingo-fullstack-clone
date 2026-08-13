@@ -62,11 +62,21 @@ export function SkillNode({ skill, onClick, index }: SkillNodeProps) {
       className="relative flex w-full justify-center py-4"
       style={{ transform: `translateX(${translateX})` }}
     >
+      {/* START tag for active available node */}
+      {isAvailable && (
+        <div className="absolute -top-6 z-20 animate-bounce">
+          <div className="bg-[#58cc02] text-white text-[11px] font-black tracking-widest px-3 py-1 rounded-xl uppercase border-2 border-white shadow-md relative">
+            START
+            <div className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-[#58cc02]" />
+          </div>
+        </div>
+      )}
+
       {/* Crown indicator for completed or in-progress */}
       {(isCompleted || isInProgress || skill.crowns > 0) && (
-        <div className="absolute -top-1 right-[calc(50%-45px)] z-10 flex items-center justify-center rounded-full bg-white px-2 py-1 shadow-sm border-2 border-[#e5e5e5]">
-          <Crown className="mr-1 h-3 w-3 text-[#ffc800] fill-[#ffc800]" />
-          <span className="text-xs font-bold text-[#ffc800]">{skill.crowns}</span>
+        <div className="absolute -top-1 right-[calc(50%-45px)] z-10 flex items-center justify-center rounded-full bg-[#182830] px-2.5 py-1 shadow-sm border-2 border-[#2b3d47]">
+          <Crown className="mr-1 h-3.5 w-3.5 text-[#ffc800] fill-[#ffc800]" />
+          <span className="text-xs font-black text-[#ffc800]">{skill.crowns}</span>
         </div>
       )}
 

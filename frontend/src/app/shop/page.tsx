@@ -2,16 +2,15 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { PageTransition } from "@/components/motion/PageTransition";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Heart, Diamond } from "lucide-react";
+import { Mascot } from "@/components/illustrations/Mascot";
+import { RightDashboard } from "@/components/layout/RightDashboard";
+import { Heart, Gem, ShieldAlert, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ProfileResponse } from "@/types/api";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function ShopPage() {
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
-  const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [message, setMessage] = useState<{ text: string, type: "success" | "error" } | null>(null);
 
@@ -21,8 +20,6 @@ export default function ShopPage() {
       setProfile(res);
     } catch {
       console.error("Failed to load profile for shop");
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -37,7 +34,6 @@ export default function ShopPage() {
   const handleRefillHearts = async () => {
     if (!profile) return;
     
-    // Frontend-side check for UX, but backend is authoritative
     if (profile.stats.hearts >= 5) {
       setMessage({ text: "Hearts are already full!", type: "error" });
       return;
@@ -60,72 +56,126 @@ export default function ShopPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e5e5e5] border-t-[#1cb0f6]"></div>
-      </div>
-    );
-  }
-
-  if (!profile) return null;
-
-  const isFull = profile.stats.hearts >= 5;
-  const isAffordable = profile.stats.gems >= 500;
+  const isFull = profile ? profile.stats.hearts >= 5 : false;
 
   return (
     <ProtectedRoute>
       <PageTransition>
-      <div className="flex flex-col gap-6 py-8 pb-32">
-        <h1 className="text-2xl font-bold uppercase tracking-wide border-b-2 border-[#e5e5e5] pb-4">
-          Shop
-        </h1>
-        
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#1cb0f6] text-xl">
-          <Diamond className="h-6 w-6 fill-current" />
-          {profile.stats.gems} Gems
-        </div>
-
-        {message && (
-          <div className={`p-4 rounded-xl font-bold ${message.type === "success" ? "bg-[#58cc02]/20 text-[#58cc02]" : "bg-[#ff4b4b]/20 text-[#ff4b4b]"}`}>
-            {message.text}
-          </div>
-        )}
-
-        <Card padding="md" className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[#ff4b4b]/20 text-[#ff4b4b]">
-                <Heart className="h-8 w-8 fill-current" />
+        <div className="flex flex-col lg:flex-row gap-8 w-full items-start py-4 md:py-6">
+          {/* Main Column */}
+          <div className="flex-1 w-full max-w-2xl flex flex-col gap-6">
+            {/* 1. Super Free Trial Hero Card */}
+            <div className="w-full bg-gradient-to-r from-[#182830] via-[#201c38] to-[#ce82ff]/30 border-2 border-[#2b3d47] rounded-3xl p-6 relative overflow-hidden flex flex-col gap-4 shadow-xl">
+              <div className="flex items-center justify-between">
+                <Mascot variant="super" className="h-24 w-24" />
+                <span className="px-3 py-1 bg-[#ce82ff] text-white text-xs font-black tracking-widest uppercase rounded-lg">
+                  SUPER
+                </span>
               </div>
+
               <div>
-                <h3 className="font-bold text-lg">Heart Refill</h3>
-                <p className="text-sm font-bold text-[#afafaf]">
-                  Get full hearts to keep learning
-                </p>
+                <h1 className="text-2xl md:text-3xl font-black text-white">
+                  Start a 1 week free trial to enjoy exclusive Super benefits
+                </h1>
+              </div>
+
+              <button className="w-full py-3.5 bg-white text-[#201c38] font-black text-sm tracking-wider uppercase rounded-2xl border-b-4 border-[#e5e5e5] hover:bg-[#f7f7f7] active:border-b-0 transition-all cursor-pointer shadow-lg mt-2">
+                START MY FREE 7 DAYS
+              </button>
+            </div>
+
+            {message && (
+              <div className={`p-4 rounded-2xl font-extrabold text-sm ${message.type === "success" ? "bg-[#58cc02]/20 text-[#58cc02] border border-[#58cc02]/40" : "bg-[#ff4b4b]/20 text-[#ff4b4b] border border-[#ff4b4b]/40"}`}>
+                {message.text}
+              </div>
+            )}
+
+            {/* 2. Hearts Section */}
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-black text-white border-b-2 border-[#2b3d47] pb-3">Hearts</h2>
+
+              {/* Card 1: Refill Hearts */}
+              <div className="bg-[#182830] border-2 border-[#2b3d47] rounded-3xl p-5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#ff4b4b]/20 text-[#ff4b4b]">
+                    <Heart className="h-8 w-8 fill-current" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-white text-lg">Refill Hearts</h3>
+                    <p className="text-xs font-bold text-[#afafaf] max-w-sm mt-0.5">
+                      Get full hearts so you can worry less about making mistakes in a lesson
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  disabled={purchasing || isFull}
+                  onClick={handleRefillHearts}
+                  className={`px-6 py-3 font-black text-xs tracking-wider uppercase rounded-2xl transition-all cursor-pointer ${
+                    isFull
+                      ? "bg-[#2b3d47] text-[#afafaf] cursor-not-allowed"
+                      : "bg-[#1cb0f6] hover:bg-[#1899d6] text-white border-b-4 border-[#0081c9] active:border-b-0"
+                  }`}
+                >
+                  {isFull ? (
+                    "FULL"
+                  ) : (
+                    <span className="flex items-center gap-1.5">
+                      <Gem className="h-4 w-4 fill-current text-[#1cb0f6]" />
+                      500
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {/* Card 2: Unlimited Hearts */}
+              <div className="bg-[#182830] border-2 border-[#2b3d47] rounded-3xl p-5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#58cc02]/20 text-[#58cc02]">
+                    <Sparkles className="h-8 w-8 text-[#58cc02]" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-white text-lg">Unlimited Hearts</h3>
+                    <p className="text-xs font-bold text-[#afafaf] max-w-sm mt-0.5">
+                      Never run out of hearts with Super!
+                    </p>
+                  </div>
+                </div>
+
+                <button className="px-6 py-3 bg-[#ce82ff] hover:bg-[#b852f2] text-white font-black text-xs tracking-wider uppercase rounded-2xl border-b-4 border-[#9d3ddb] active:border-b-0 transition-all cursor-pointer">
+                  FREE TRIAL
+                </button>
+              </div>
+            </div>
+
+            {/* 3. Power-Ups Section */}
+            <div className="flex flex-col gap-4 mt-2">
+              <h2 className="text-2xl font-black text-white border-b-2 border-[#2b3d47] pb-3">Power-Ups</h2>
+
+              <div className="bg-[#182830] border-2 border-[#2b3d47] rounded-3xl p-5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#ff9600]/20 text-[#ff9600]">
+                    <ShieldAlert className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-white text-lg">Streak Freeze</h3>
+                    <p className="text-xs font-bold text-[#afafaf] max-w-sm mt-0.5">
+                      Streak Freeze allows your streak to remain intact if you miss a day of practice.
+                    </p>
+                  </div>
+                </div>
+
+                <span className="px-4 py-2.5 bg-[#2b3d47] text-[#afafaf] font-black text-xs tracking-wider uppercase rounded-2xl">
+                  EQUIPPED
+                </span>
               </div>
             </div>
           </div>
-          
-          <Button
-            variant={isFull ? "secondary" : (isAffordable ? "primary" : "secondary")}
-            size="lg"
-            className="w-full flex items-center justify-center gap-2"
-            disabled={purchasing || isFull}
-            onClick={handleRefillHearts}
-          >
-            {isFull ? (
-              "FULL"
-            ) : (
-              <>
-                <Diamond className="h-5 w-5 fill-current" />
-                500
-              </>
-            )}
-          </Button>
-        </Card>
-      </div>
-    </PageTransition>
+
+          {/* Right Dashboard Column */}
+          <RightDashboard />
+        </div>
+      </PageTransition>
     </ProtectedRoute>
   );
 }
