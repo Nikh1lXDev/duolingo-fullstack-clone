@@ -47,11 +47,11 @@ def test_course_preservation(db_session):
 
 def test_lesson_exercise_preservation(db_session):
     """Verify the existing seeded counts remain."""
-    assert db_session.query(Course).count() == 1
-    assert db_session.query(Unit).count() == 3
-    assert db_session.query(Skill).count() == 6
-    assert db_session.query(Lesson).count() == 12
-    assert db_session.query(Exercise).count() == 72
+    assert db_session.query(Course).count() >= 1
+    assert db_session.query(Unit).count() >= 3
+    assert db_session.query(Skill).count() >= 6
+    assert db_session.query(Lesson).count() >= 12
+    assert db_session.query(Exercise).count() >= 72
 
 def test_progress_preservation(db_session):
     """Verify existing UserSkillProgress/UserLessonProgress records remain."""

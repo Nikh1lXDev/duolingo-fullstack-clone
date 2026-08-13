@@ -58,7 +58,10 @@ def get_me_settings(current_user: User = Depends(get_current_user), db: Session 
 
 @router.put("/me/settings", response_model=UserSettingsResponse)
 def update_me_settings(payload: UserSettingsUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return update_user_settings(db, current_user.id, payload)
+    try:
+        return update_user_settings(db, current_user.id, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/me/progress")
 def get_me_progress(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -72,7 +75,12 @@ def get_me_progress(current_user: User = Depends(get_current_user), db: Session 
 
 @router.get("/me/learning-path", response_model=LearningPathResponse)
 def get_me_learning_path(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.is_active == True).first()
+    user_settings = get_user_settings(db, current_user.id)
+    course = None
+    if user_settings.course_id:
+        course = db.query(Course).filter(Course.id == user_settings.course_id, Course.is_active == True).first()
+    if not course:
+        course = db.query(Course).filter(Course.is_active == True).first()
     if not course:
         raise HTTPException(status_code=404, detail="Active course not found")
         

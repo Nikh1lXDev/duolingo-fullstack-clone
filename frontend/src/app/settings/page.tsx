@@ -5,21 +5,26 @@ import { PageTransition } from "@/components/motion/PageTransition";
 import { Card } from "@/components/ui/Card";
 import { Volume2, Bell, Globe } from "lucide-react";
 import { api } from "@/lib/api";
-import type { UserSettings } from "@/types/api";
+import type { UserSettings, Course } from "@/types/api";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<UserSettings | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string, type: "success" | "error" } | null>(null);
 
-  const fetchSettings = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
-      const res = await api.getSettings();
-      setSettings(res);
+      const [userSettings, fetchedCourses] = await Promise.all([
+        api.getSettings(),
+        api.getCourses()
+      ]);
+      setSettings(userSettings);
+      setCourses(fetchedCourses);
     } catch {
-      console.error("Failed to load settings");
+      setMessage({ text: "Failed to load settings or available courses.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -27,13 +32,17 @@ export default function SettingsPage() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchSettings();
-  }, [fetchSettings]);
+    loadData();
+  }, [loadData]);
 
-  const updateSetting = async (key: keyof UserSettings, value: boolean | string) => {
+  const updateSetting = async (updatedFields: Partial<UserSettings>) => {
     if (!settings) return;
     
-    const newSettings = { ...settings, [key]: value };
+    const newSettings: UserSettings = {
+      ...settings,
+      ...updatedFields
+    };
+
     setSaving(true);
     setMessage(null);
     try {
@@ -57,6 +66,8 @@ export default function SettingsPage() {
   }
 
   if (!settings) return null;
+
+  const currentCourseId = settings.course_id ?? (courses.length > 0 ? courses[0].id : 1);
 
   return (
     <ProtectedRoute>
@@ -85,7 +96,7 @@ export default function SettingsPage() {
             </div>
             <button 
               disabled={saving}
-              onClick={() => updateSetting("sound_enabled", !settings.sound_enabled)}
+              onClick={() => updateSetting({ sound_enabled: !settings.sound_enabled })}
               className={`w-14 h-8 rounded-full transition-colors relative ${settings.sound_enabled ? "bg-[#1cb0f6]" : "bg-[#e5e5e5]"}`}
             >
               <div className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-transform ${settings.sound_enabled ? "translate-x-7" : "translate-x-1"}`} />
@@ -104,7 +115,7 @@ export default function SettingsPage() {
             </div>
             <button 
               disabled={saving}
-              onClick={() => updateSetting("notifications_enabled", !settings.notifications_enabled)}
+              onClick={() => updateSetting({ notifications_enabled: !settings.notifications_enabled })}
               className={`w-14 h-8 rounded-full transition-colors relative ${settings.notifications_enabled ? "bg-[#1cb0f6]" : "bg-[#e5e5e5]"}`}
             >
               <div className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-transform ${settings.notifications_enabled ? "translate-x-7" : "translate-x-1"}`} />
@@ -118,19 +129,25 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg">Course Language</h3>
-                <p className="text-sm font-bold text-[#afafaf]">Your target language</p>
+                <p className="text-sm font-bold text-[#afafaf]">Select target learning course</p>
               </div>
             </div>
-            <select 
-              disabled={saving}
-              value={settings.course_language}
-              onChange={(e) => updateSetting("course_language", e.target.value)}
-              className="border-2 border-[#e5e5e5] rounded-xl font-bold px-4 py-2 text-[#777777] bg-white"
-            >
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-            </select>
+            {courses.length > 0 ? (
+              <select 
+                disabled={saving}
+                value={currentCourseId}
+                onChange={(e) => updateSetting({ course_id: Number(e.target.value) })}
+                className="border-2 border-[#e5e5e5] rounded-xl font-bold px-4 py-2 text-[#777777] bg-white cursor-pointer"
+              >
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.source_language || course.name} → {course.target_language || "English"}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-sm font-bold text-[#afafaf]">No courses available</span>
+            )}
           </Card>
         </div>
       </div>

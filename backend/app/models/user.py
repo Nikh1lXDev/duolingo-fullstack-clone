@@ -28,10 +28,12 @@ class UserSettings(Base):
     sound_enabled = Column(Boolean, default=True)
     notifications_enabled = Column(Boolean, default=True)
     course_language = Column(String, default="es")
+    course_id = Column(Integer, ForeignKey("courses.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="settings")
+    course = relationship("Course")
 
 
 

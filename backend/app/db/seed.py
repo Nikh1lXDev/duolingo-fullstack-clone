@@ -2,7 +2,7 @@ import json
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal, engine
 from app.db.base import Base
-from app.models.user import User, UserStats
+from app.models.user import User, UserStats, UserSettings
 from app.models.course import Course
 from app.models.unit import Unit
 from app.models.skill import Skill
@@ -10,6 +10,167 @@ from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 from app.models.vocabulary import VocabularyItem
 from app.models.progress import UserSkillProgress, UserLessonProgress
+
+def create_course_with_content(db: Session, name: str, source_lang: str, target_lang: str, icon: str, vocab_list: list):
+    course = db.query(Course).filter(Course.source_language == source_lang, Course.target_language == target_lang).first()
+    if not course:
+        print(f"Creating course: {source_lang} -> {target_lang}...")
+        course = Course(
+            name=name,
+            language=target_lang.lower()[:2],
+            source_language=source_lang,
+            target_language=target_lang,
+            description=f"Learn {target_lang} from {source_lang}.",
+            icon=icon,
+            is_active=True
+        )
+        db.add(course)
+        db.commit()
+        db.refresh(course)
+
+    # Check if units/skills exist
+    unit = db.query(Unit).filter(Unit.course_id == course.id).first()
+    if not unit:
+        unit = Unit(course_id=course.id, title="Unit 1", description="Basics & Fundamentals", order_index=1, is_locked=False)
+        db.add(unit)
+        db.commit()
+        db.refresh(unit)
+
+        skill = Skill(unit_id=unit.id, title="Basics", description="Core vocabulary", order_index=1, is_locked=False)
+        db.add(skill)
+        db.commit()
+        db.refresh(skill)
+
+        for i in range(1, 3):
+            lesson = Lesson(skill_id=skill.id, title=f"Lesson {i}", description=f"Basic lesson {i}", order_index=i)
+            db.add(lesson)
+        db.commit()
+
+    # Seed vocabulary
+    existing_vocab = db.query(VocabularyItem).filter(VocabularyItem.course_id == course.id).count()
+    if existing_vocab == 0:
+        skill = db.query(Skill).join(Unit).filter(Unit.course_id == course.id).first()
+        sk_id = skill.id if skill else None
+        for src, tgt, cat in vocab_list:
+            v = VocabularyItem(
+                course_id=course.id,
+                skill_id=sk_id,
+                source_text=src,
+                target_text=tgt,
+                category=cat,
+                difficulty=1
+            )
+            db.add(v)
+        db.commit()
+
+def seed_additional_courses(db: Session):
+    additional_courses = [
+        ("Hindi to English", "Hindi", "English", "in_flag.png", [
+            ("नमस्ते", "hello", "greetings"),
+            ("धन्यवाद", "thank you", "greetings"),
+            ("हाँ", "yes", "basics"),
+            ("नहीं", "no", "basics"),
+            ("पानी", "water", "beverages"),
+            ("सेब", "apple", "food"),
+            ("बिल्ली", "cat", "animals"),
+            ("कुत्ता", "dog", "animals"),
+            ("किताब", "book", "objects"),
+            ("घर", "house", "places"),
+            ("दूध", "milk", "beverages"),
+            ("रोटी", "bread", "food"),
+            ("माँ", "mother", "family"),
+            ("पिता", "father", "family"),
+            ("दोस्त", "friend", "people"),
+        ]),
+        ("French to English", "French", "English", "fr_flag.png", [
+            ("bonjour", "hello", "greetings"),
+            ("merci", "thank you", "greetings"),
+            ("oui", "yes", "basics"),
+            ("non", "no", "basics"),
+            ("eau", "water", "beverages"),
+            ("pomme", "apple", "food"),
+            ("chat", "cat", "animals"),
+            ("chien", "dog", "animals"),
+            ("livre", "book", "objects"),
+            ("maison", "house", "places"),
+            ("lait", "milk", "beverages"),
+            ("pain", "bread", "food"),
+            ("mère", "mother", "family"),
+            ("père", "father", "family"),
+            ("ami", "friend", "people"),
+        ]),
+        ("German to English", "German", "English", "de_flag.png", [
+            ("hallo", "hello", "greetings"),
+            ("danke", "thank you", "greetings"),
+            ("ja", "yes", "basics"),
+            ("nein", "no", "basics"),
+            ("wasser", "water", "beverages"),
+            ("apfel", "apple", "food"),
+            ("katze", "cat", "animals"),
+            ("hund", "dog", "animals"),
+            ("buch", "book", "objects"),
+            ("haus", "house", "places"),
+            ("milch", "milk", "beverages"),
+            ("brot", "bread", "food"),
+            ("mutter", "mother", "family"),
+            ("vater", "father", "family"),
+            ("freund", "friend", "people"),
+        ]),
+        ("Italian to English", "Italian", "English", "it_flag.png", [
+            ("ciao", "hello", "greetings"),
+            ("grazie", "thank you", "greetings"),
+            ("sì", "yes", "basics"),
+            ("no", "no", "basics"),
+            ("acqua", "water", "beverages"),
+            ("mela", "apple", "food"),
+            ("gatto", "cat", "animals"),
+            ("cane", "dog", "animals"),
+            ("libro", "book", "objects"),
+            ("casa", "house", "places"),
+            ("latte", "milk", "beverages"),
+            ("pane", "bread", "food"),
+            ("madre", "mother", "family"),
+            ("padre", "father", "family"),
+            ("amico", "friend", "people"),
+        ]),
+        ("Portuguese to English", "Portuguese", "English", "pt_flag.png", [
+            ("olá", "hello", "greetings"),
+            ("obrigado", "thank you", "greetings"),
+            ("sim", "yes", "basics"),
+            ("não", "no", "basics"),
+            ("água", "water", "beverages"),
+            ("maçã", "apple", "food"),
+            ("gato", "cat", "animals"),
+            ("cão", "dog", "animals"),
+            ("livro", "book", "objects"),
+            ("casa", "house", "places"),
+            ("leite", "milk", "beverages"),
+            ("pão", "bread", "food"),
+            ("mãe", "mother", "family"),
+            ("pai", "father", "family"),
+            ("amigo", "friend", "people"),
+        ]),
+        ("Japanese to English", "Japanese", "English", "jp_flag.png", [
+            ("こんにちは", "hello", "greetings"),
+            ("ありがとう", "thank you", "greetings"),
+            ("はい", "yes", "basics"),
+            ("いいえ", "no", "basics"),
+            ("みず", "water", "beverages"),
+            ("りんご", "apple", "food"),
+            ("ねこ", "cat", "animals"),
+            ("いぬ", "dog", "animals"),
+            ("ほん", "book", "objects"),
+            ("いえ", "house", "places"),
+            ("ぎゅうにゅう", "milk", "beverages"),
+            ("パン", "bread", "food"),
+            ("おかあさん", "mother", "family"),
+            ("おとうさん", "father", "family"),
+            ("ともだち", "friend", "people"),
+        ]),
+    ]
+
+    for name, src, tgt, icon, vlist in additional_courses:
+        create_course_with_content(db, name, src, tgt, icon, vlist)
 
 def seed_vocabulary(db: Session, course_id: int, skills: list):
     existing_count = db.query(VocabularyItem).filter(VocabularyItem.course_id == course_id).count()
@@ -118,7 +279,7 @@ def seed_data():
                 language="en",
                 source_language="Spanish",
                 target_language="English",
-                description="Learn basic English vocabulary and grammar.",
+                description="Learn basic English vocabulary and grammar from Spanish.",
                 icon="us_flag.png",
                 is_active=True
             )
@@ -232,7 +393,6 @@ def seed_data():
             print("Demo data seeding complete.")
 
         else:
-            # Ensure course has language fields updated if missing
             course = db.query(Course).first()
             if course:
                 if not getattr(course, "source_language", None):
@@ -241,10 +401,12 @@ def seed_data():
                     course.target_language = "English"
                 db.commit()
 
-            # Ensure vocabulary is seeded even if course already exists
             skills = db.query(Skill).all()
             if course and skills:
                 seed_vocabulary(db, course.id, skills)
+
+        # Seed 6 additional language courses idempotently
+        seed_additional_courses(db)
 
         print("Seeding leaderboard mock users...")
         mock_users = [

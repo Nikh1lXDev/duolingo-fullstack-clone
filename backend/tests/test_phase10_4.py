@@ -147,9 +147,13 @@ def test_api_lesson_endpoint_returns_dynamic_exercises():
     for ex in data["exercises"]:
         assert "direction" in ex
 
+import uuid
+
 def test_me_next_lesson_endpoint_returns_dynamic_exercises():
     test_client = TestClient(app)
-    test_client.post("/api/auth/register", json={"username": "dyn_user_a", "email": "dyn_user_a@example.com", "password": "password123"})
+    u_name = f"dyn_user_{uuid.uuid4().hex[:6]}"
+    reg_res = test_client.post("/api/auth/register", json={"username": u_name, "email": f"{u_name}@example.com", "password": "password123"})
+    assert reg_res.status_code in (200, 201)
     response = test_client.get("/api/users/me/skills/1/next-lesson")
     assert response.status_code == 200
     data = response.json()

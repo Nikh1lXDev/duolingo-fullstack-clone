@@ -169,10 +169,12 @@ export interface UserSettings {
   sound_enabled: boolean;
   notifications_enabled: boolean;
   course_language: string;
+  course_id?: number;
 }
 
 export interface UserSettingsUpdate {
   sound_enabled: boolean;
   notifications_enabled: boolean;
   course_language: string;
+  course_id?: number;
 }
