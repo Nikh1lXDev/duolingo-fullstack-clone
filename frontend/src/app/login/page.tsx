@@ -28,7 +28,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await api.login({ identifier, password });
+      await api.login({ username: identifier, password });
       await refreshUser();
       router.push("/");
     } catch {
