@@ -11,7 +11,11 @@ class Course(Base):
     language = Column(String, index=True, nullable=False)
     description = Column(String)
     icon = Column(String)
+    source_language = Column(String, default="Spanish")
+    target_language = Column(String, default="English")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     units = relationship("Unit", back_populates="course", cascade="all, delete-orphan", order_by="Unit.order_index")
+    vocabulary_items = relationship("VocabularyItem", back_populates="course", cascade="all, delete-orphan")
+

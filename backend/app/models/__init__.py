@@ -5,5 +5,7 @@ from .unit import Unit
 from .skill import Skill
 from .lesson import Lesson
 from .exercise import Exercise
+from .vocabulary import VocabularyItem
 from .progress import UserSkillProgress, UserLessonProgress
+
 

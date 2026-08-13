@@ -29,6 +29,8 @@ export interface Course {
   id: number;
   name: string;
   language: string;
+  source_language?: string;
+  target_language?: string;
   description: string | null;
   icon: string | null;
   is_active: boolean;
@@ -43,6 +45,7 @@ export interface Exercise {
   correct_answer: string;
   options: string | null;
   translation: string | null;
+  direction?: string;
   order_index: number;
   xp_reward: number;
 }

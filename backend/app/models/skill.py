@@ -17,3 +17,5 @@ class Skill(Base):
     unit = relationship("Unit", back_populates="skills")
     lessons = relationship("Lesson", back_populates="skill", cascade="all, delete-orphan", order_by="Lesson.order_index")
     user_progress = relationship("UserSkillProgress", back_populates="skill", cascade="all, delete-orphan")
+    vocabulary_items = relationship("VocabularyItem", back_populates="skill", cascade="all, delete-orphan")
+

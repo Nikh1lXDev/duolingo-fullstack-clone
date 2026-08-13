@@ -7,6 +7,7 @@ class ExerciseBase(BaseModel):
     correct_answer: str
     options: Optional[str] = None
     translation: Optional[str] = None
+    direction: Optional[str] = "source_to_target"
     order_index: int
     xp_reward: int
 

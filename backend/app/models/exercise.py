@@ -12,7 +12,9 @@ class Exercise(Base):
     correct_answer = Column(String, nullable=False)
     options = Column(Text) # JSON string representation
     translation = Column(String)
+    direction = Column(String, default="source_to_target") # source_to_target or target_to_source
     order_index = Column(Integer, nullable=False)
     xp_reward = Column(Integer, default=2)
+
     
     lesson = relationship("Lesson", back_populates="exercises")

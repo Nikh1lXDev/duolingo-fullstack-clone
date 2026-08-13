@@ -5,6 +5,8 @@ from typing import Optional, List
 class CourseBase(BaseModel):
     name: str
     language: str
+    source_language: Optional[str] = "Spanish"
+    target_language: Optional[str] = "English"
     description: Optional[str] = None
     icon: Optional[str] = None
     is_active: bool

@@ -112,6 +112,8 @@ def get_me_learning_path(current_user: User = Depends(get_current_user), db: Ses
         
     return LearningPathResponse(course=course, units=learning_path_units)
 
+from app.services.exercise_generator import generate_exercises_for_lesson
+
 @router.get("/me/skills/{skill_id}/next-lesson", response_model=LessonWithExercises)
 def get_me_next_lesson(skill_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     lessons = db.query(Lesson).filter(Lesson.skill_id == skill_id).order_by(Lesson.order_index).all()
@@ -121,10 +123,23 @@ def get_me_next_lesson(skill_id: int, current_user: User = Depends(get_current_u
     progress_records = db.query(UserLessonProgress).filter(UserLessonProgress.user_id == current_user.id).all()
     completed_lesson_ids = {p.lesson_id for p in progress_records if p.completed}
     
+    target_lesson = lessons[0]
     for lesson in lessons:
         if lesson.id not in completed_lesson_ids:
-            return lesson
-    return lessons[0]
+            target_lesson = lesson
+            break
+            
+    dynamic_exercises = generate_exercises_for_lesson(db, target_lesson, user_id=current_user.id)
+    return LessonWithExercises(
+        id=target_lesson.id,
+        skill_id=target_lesson.skill_id,
+        title=target_lesson.title,
+        description=target_lesson.description,
+        order_index=target_lesson.order_index,
+        xp_reward=target_lesson.xp_reward,
+        difficulty=target_lesson.difficulty,
+        exercises=dynamic_exercises
+    )
 
 @router.post("/me/lessons/{lesson_id}/progress", response_model=UserLessonProgressSchema)
 def update_me_lesson_progress(lesson_id: int, payload: UserLessonProgressUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):

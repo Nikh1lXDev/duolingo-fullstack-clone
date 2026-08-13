@@ -8,7 +8,73 @@ from app.models.unit import Unit
 from app.models.skill import Skill
 from app.models.lesson import Lesson
 from app.models.exercise import Exercise
+from app.models.vocabulary import VocabularyItem
 from app.models.progress import UserSkillProgress, UserLessonProgress
+
+def seed_vocabulary(db: Session, course_id: int, skills: list):
+    existing_count = db.query(VocabularyItem).filter(VocabularyItem.course_id == course_id).count()
+    if existing_count > 0:
+        return
+
+    print("Seeding course vocabulary items...")
+    skill_map = {s.title: s.id for s in skills}
+
+    vocab_data = [
+        # Basics
+        ("manzana", "apple", "food", 1, "Basics"),
+        ("agua", "water", "beverages", 1, "Basics"),
+        ("sí", "yes", "general", 1, "Basics"),
+        ("no", "no", "general", 1, "Basics"),
+        ("libro", "book", "objects", 1, "Basics"),
+
+        # Greetings
+        ("hola", "hello", "greetings", 1, "Greetings"),
+        ("adiós", "goodbye", "greetings", 1, "Greetings"),
+        ("gracias", "thank you", "greetings", 1, "Greetings"),
+        ("por favor", "please", "greetings", 1, "Greetings"),
+        ("buenos días", "good morning", "greetings", 1, "Greetings"),
+
+        # Food
+        ("pan", "bread", "food", 2, "Food"),
+        ("leche", "milk", "beverages", 2, "Food"),
+        ("queso", "cheese", "food", 2, "Food"),
+        ("arroz", "rice", "food", 2, "Food"),
+        ("fruta", "fruit", "food", 2, "Food"),
+
+        # Family
+        ("madre", "mother", "family", 2, "Family"),
+        ("padre", "father", "family", 2, "Family"),
+        ("hermano", "brother", "family", 2, "Family"),
+        ("hermana", "sister", "family", 2, "Family"),
+        ("hijo", "son", "family", 2, "Family"),
+
+        # Animals
+        ("gato", "cat", "animals", 3, "Animals"),
+        ("perro", "dog", "animals", 3, "Animals"),
+        ("pájaro", "bird", "animals", 3, "Animals"),
+        ("caballo", "horse", "animals", 3, "Animals"),
+        ("pez", "fish", "animals", 3, "Animals"),
+
+        # Everyday Life
+        ("casa", "house", "places", 3, "Everyday Life"),
+        ("escuela", "school", "places", 3, "Everyday Life"),
+        ("estudiante", "student", "people", 3, "Everyday Life"),
+        ("trabajo", "work", "activities", 3, "Everyday Life"),
+        ("amigo", "friend", "people", 3, "Everyday Life"),
+    ]
+
+    for src, tgt, cat, diff, skill_name in vocab_data:
+        sk_id = skill_map.get(skill_name)
+        v = VocabularyItem(
+            course_id=course_id,
+            skill_id=sk_id,
+            source_text=src,
+            target_text=tgt,
+            category=cat,
+            difficulty=diff
+        )
+        db.add(v)
+    db.commit()
 
 def seed_data():
     db = SessionLocal()
@@ -50,6 +116,8 @@ def seed_data():
             course = Course(
                 name="English for Beginners",
                 language="en",
+                source_language="Spanish",
+                target_language="English",
                 description="Learn basic English vocabulary and grammar.",
                 icon="us_flag.png",
                 is_active=True
@@ -80,6 +148,9 @@ def seed_data():
                 db.add(s)
                 skills.append(s)
             db.commit()
+
+            # Seed vocabulary
+            seed_vocabulary(db, course.id, skills)
             
             # 5. Lessons (2 per skill)
             lessons = []
@@ -92,51 +163,39 @@ def seed_data():
                     l_idx += 1
             db.commit()
             
-            # 6. Exercises (6 per lesson, one of each type)
+            # 6. Seed Baseline Exercises
             exercise_pools = {
                 "multiple_choice": [
-                    {"prompt": "Which of these is 'Apple'?", "correct_answer": "Manzana", "options": json.dumps(["Manzana", "Gato", "Perro"])},
-                    {"prompt": "Which of these is 'Cat'?", "correct_answer": "Gato", "options": json.dumps(["Manzana", "Gato", "Perro"])},
-                    {"prompt": "Which of these is 'Dog'?", "correct_answer": "Perro", "options": json.dumps(["Manzana", "Gato", "Perro"])},
+                    {"prompt": "What is 'manzana' in English?", "correct_answer": "apple", "options": json.dumps(["apple", "cat", "dog"]), "direction": "source_to_target"},
+                    {"prompt": "Which word means 'hello'?", "correct_answer": "hola", "options": json.dumps(["hola", "gracias", "adiós"]), "direction": "target_to_source"},
                 ],
                 "translate": [
-                    {"prompt": "Hola", "correct_answer": "Hello", "translation": "Greeting"},
-                    {"prompt": "Adiós", "correct_answer": "Goodbye", "translation": "Farewell"},
-                    {"prompt": "Gracias", "correct_answer": "Thank you", "translation": "Expression of gratitude"},
+                    {"prompt": "hola", "correct_answer": "hello", "translation": "Translate to English", "direction": "source_to_target"},
+                    {"prompt": "water", "correct_answer": "agua", "translation": "Translate to Spanish", "direction": "target_to_source"},
                 ],
                 "word_bank": [
-                    {"prompt": "Translate: 'I am a student'", "correct_answer": "Soy un estudiante", "options": json.dumps(["Soy", "un", "estudiante", "una", "manzana"])},
-                    {"prompt": "Translate: 'The cat eats'", "correct_answer": "El gato come", "options": json.dumps(["El", "gato", "come", "perro", "la"])},
-                    {"prompt": "Translate: 'Good morning'", "correct_answer": "Buenos días", "options": json.dumps(["Buenos", "días", "tardes", "Hola"])},
+                    {"prompt": "Translate: 'manzana'", "correct_answer": "apple", "options": json.dumps(["apple", "cat", "water", "book"]), "direction": "source_to_target"},
                 ],
                 "match_pairs": [
                     {
                         "prompt": "Match the words",
-                        "correct_answer": json.dumps({"Hello": "Hola", "Apple": "Manzana", "Cat": "Gato", "Dog": "Perro"}),
-                        "options": json.dumps(["Hello", "Hola", "Apple", "Manzana", "Cat", "Gato", "Dog", "Perro"])
-                    },
-                    {
-                        "prompt": "Match the greetings",
-                        "correct_answer": json.dumps({"Good morning": "Buenos días", "Good night": "Buenas noches", "Goodbye": "Adiós", "Please": "Por favor"}),
-                        "options": json.dumps(["Good morning", "Buenos días", "Good night", "Buenas noches", "Goodbye", "Adiós", "Please", "Por favor"])
+                        "correct_answer": json.dumps({"hello": "hola", "apple": "manzana", "cat": "gato", "dog": "perro"}),
+                        "options": json.dumps(["hello", "hola", "apple", "manzana", "cat", "gato", "dog", "perro"]),
+                        "direction": "source_to_target"
                     }
                 ],
                 "fill_blank": [
-                    {"prompt": "Yo ___ un estudiante.", "correct_answer": "soy", "options": json.dumps(["soy", "eres", "es"])},
-                    {"prompt": "El perro ___ agua.", "correct_answer": "bebe", "options": json.dumps(["bebe", "comes", "soy"])},
-                    {"prompt": "___ noches.", "correct_answer": "Buenas", "options": json.dumps(["Buenas", "Buenos", "Hola"])},
+                    {"prompt": "___ means 'apple'.", "correct_answer": "manzana", "options": json.dumps(["manzana", "gato", "perro"]), "direction": "target_to_source"}
                 ],
                 "type_answer": [
-                    {"prompt": "How do you say 'Hello'?", "correct_answer": "Hola"},
-                    {"prompt": "Type the translation for 'Dog'", "correct_answer": "Perro"},
-                    {"prompt": "How do you say 'Thank you'?", "correct_answer": "Gracias"},
+                    {"prompt": "Type the English word for 'manzana'", "correct_answer": "apple", "direction": "source_to_target"}
                 ]
             }
             
             e_types = ["multiple_choice", "translate", "word_bank", "match_pairs", "fill_blank", "type_answer"]
             e_idx = 1
             for l in lessons:
-                for i in range(6):  # 6 exercises per lesson to cover all types
+                for i in range(6):
                     etype = e_types[i % len(e_types)]
                     pool = exercise_pools[etype]
                     chosen = pool[i % len(pool)]
@@ -148,36 +207,46 @@ def seed_data():
                         correct_answer=chosen.get("correct_answer"),
                         options=chosen.get("options"),
                         translation=chosen.get("translation"),
+                        direction=chosen.get("direction", "source_to_target"),
                         order_index=i + 1
                     )
                     db.add(ex)
                     e_idx += 1
             db.commit()
             
-            # 7. Progression (1 completed, 1 in-progress, 1 unlocked, rest locked)
-            # Skill 1: Completed
+            # 7. Progression
             sp1 = UserSkillProgress(user_id=demo_user.id, skill_id=skills[0].id, completed=True, progress=100, crowns=1, lessons_completed=2)
             db.add(sp1)
-            # Lessons for Skill 1
             db.add(UserLessonProgress(user_id=demo_user.id, lesson_id=lessons[0].id, completed=True, progress=100, attempts=1, score=100))
             db.add(UserLessonProgress(user_id=demo_user.id, lesson_id=lessons[1].id, completed=True, progress=100, attempts=1, score=100))
             
-            # Skill 2: In-Progress
             sp2 = UserSkillProgress(user_id=demo_user.id, skill_id=skills[1].id, completed=False, progress=50, crowns=0, lessons_completed=1)
             db.add(sp2)
-            # Lessons for Skill 2
             db.add(UserLessonProgress(user_id=demo_user.id, lesson_id=lessons[2].id, completed=True, progress=100, attempts=1, score=90))
             db.add(UserLessonProgress(user_id=demo_user.id, lesson_id=lessons[3].id, completed=False, progress=0, attempts=0, score=0))
             
-            # Skill 3 is unlocked but no progress record needed yet (or we can create one with 0)
             sp3 = UserSkillProgress(user_id=demo_user.id, skill_id=skills[2].id, completed=False, progress=0, crowns=0, lessons_completed=0)
             db.add(sp3)
             
             db.commit()
             print("Demo data seeding complete.")
 
+        else:
+            # Ensure course has language fields updated if missing
+            course = db.query(Course).first()
+            if course:
+                if not getattr(course, "source_language", None):
+                    course.source_language = "Spanish"
+                if not getattr(course, "target_language", None):
+                    course.target_language = "English"
+                db.commit()
+
+            # Ensure vocabulary is seeded even if course already exists
+            skills = db.query(Skill).all()
+            if course and skills:
+                seed_vocabulary(db, course.id, skills)
+
         print("Seeding leaderboard mock users...")
-        
         mock_users = [
             {"username": "alex", "email": "alex@example.com", "display_name": "Alex", "xp": 1250, "streak": 14},
             {"username": "maya", "email": "maya@example.com", "display_name": "Maya", "xp": 980, "streak": 7},
