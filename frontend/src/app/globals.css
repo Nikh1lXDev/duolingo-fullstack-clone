@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand */
+  --color-brand: #58cc02;
+  --color-brand-dark: #46a302;
+  --color-brand-light: #89e219;
+
+  /* Accents */
+  --color-blue: #1cb0f6;
+  --color-blue-dark: #1899d6;
+  --color-red: #ff4b4b;
+  --color-red-dark: #ea2b2b;
+  --color-yellow: #ffc800;
+  --color-yellow-dark: #dca300;
+  --color-orange: #ff9600;
+  --color-orange-dark: #cc7800;
+  --color-purple: #ce82ff;
+  --color-purple-dark: #b852f2;
+  
+  /* Status (Mapped to accents usually) */
+  --color-success: #58cc02;
+  --color-error: #ff4b4b;
+  --color-warning: #ffc800;
+  --color-info: #1cb0f6;
+
+  /* Neutrals */
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f7f7f7;
+  --color-border: #e5e5e5;
+  --color-border-dark: #cecece;
+  --color-text: #3c3c3c;
+  --color-text-secondary: #777777;
+  --color-text-muted: #afafaf;
+  --color-white: #ffffff;
+  
+  /* Spacing */
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
+  --spacing-nav-mobile: 80px;
+
+  /* Shadows (Depth) */
+  --shadow-sm: 0 2px 0 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 0 0 rgba(0, 0, 0, 0.05);
+  --shadow-btn: 0 4px 0 0; /* Used with explicit colors */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #131f24;
+    --color-surface: #202f36;
+    --color-surface-hover: #29383e;
+    --color-border: #37464f;
+    --color-border-dark: #2c3a42;
+    --color-text: #ffffff;
+    --color-text-secondary: #afafaf;
+    --color-text-muted: #777777;
+  }
+}
+
+@theme inline {
+  --color-brand: var(--color-brand);
+  --color-brand-dark: var(--color-brand-dark);
+  --color-brand-light: var(--color-brand-light);
+  
+  --color-blue: var(--color-blue);
+  --color-blue-dark: var(--color-blue-dark);
+  --color-red: var(--color-red);
+  --color-red-dark: var(--color-red-dark);
+  --color-yellow: var(--color-yellow);
+  --color-yellow-dark: var(--color-yellow-dark);
+  --color-orange: var(--color-orange);
+  --color-orange-dark: var(--color-orange-dark);
+  --color-purple: var(--color-purple);
+  --color-purple-dark: var(--color-purple-dark);
+  
+  --color-success: var(--color-success);
+  --color-error: var(--color-error);
+  --color-warning: var(--color-warning);
+  --color-info: var(--color-info);
+  
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-border: var(--color-border);
+  --color-border-dark: var(--color-border-dark);
+  --color-text: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-white: var(--color-white);
+
+  --font-sans: var(--font-nunito), ui-rounded, "Quicksand", sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base utility overrides for tactile components */
+* {
+  border-color: var(--color-border);
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
