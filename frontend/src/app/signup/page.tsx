@@ -17,7 +17,7 @@ export default function SignupPage() {
   
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, refreshUser } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -49,24 +49,22 @@ export default function SignupPage() {
         display_name: displayName || username, // fallback
         password 
       });
-      // Redirect to login after successful registration
-      router.push("/login");
+      await refreshUser();
+      router.push("/");
     } catch (err) {
       console.error("Signup failed");
-      // Determine error type based on message or structure
-      // Typically backend returns 400 or 409 with specific details
       const error = err as Error;
       const errMsg = error.message || "";
-      if (errMsg.includes("username") || errMsg.includes("Username")) {
+      if (errMsg.includes("username") || errMsg.includes("Username") || errMsg.includes("taken")) {
         setError("That username is already in use.");
-      } else if (errMsg.includes("email") || errMsg.includes("Email")) {
-        setError("That email is already in use.");
+      } else if (errMsg.includes("email") || errMsg.includes("Email") || errMsg.includes("registered")) {
+        setError("That email is already registered.");
       } else if (errMsg.includes("409")) {
         setError("That username or email is already in use.");
       } else if (errMsg.includes("422")) {
         setError("Please check your input and try again.");
       } else {
-        setError("An unexpected error occurred. Please try again.");
+        setError(errMsg || "An unexpected error occurred. Please try again.");
       }
       setPassword("");
       setConfirmPassword("");

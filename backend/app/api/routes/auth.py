@@ -10,9 +10,18 @@ from app.services.session import create_session, revoke_session
 router = APIRouter()
 
 @router.post("/register", response_model=AuthUserResponse, status_code=status.HTTP_201_CREATED)
-def api_register(req: AuthRegisterRequest, db: Session = Depends(get_db)):
+def api_register(req: AuthRegisterRequest, response: Response, db: Session = Depends(get_db)):
     try:
         user = register_user(db, req)
+        raw_token, session_record = create_session(db, user.id, settings.AUTH_SESSION_EXPIRE_DAYS)
+        response.set_cookie(
+            key="duolingo_session",
+            value=raw_token,
+            httponly=True,
+            samesite="lax",
+            secure=False,
+            max_age=settings.AUTH_SESSION_EXPIRE_DAYS * 24 * 60 * 60,
+        )
         return user
     except DuplicateEmailError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))

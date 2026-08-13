@@ -13,7 +13,16 @@ export async function fetcher<T>(endpoint: string, options?: RequestInit): Promi
   });
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    let errorDetail = `API error: ${response.status} ${response.statusText}`;
+    try {
+      const errorJson = await response.json();
+      if (errorJson.detail) {
+        errorDetail = typeof errorJson.detail === "string" ? errorJson.detail : JSON.stringify(errorJson.detail);
+      }
+    } catch {
+      // ignore json parse error
+    }
+    throw new Error(errorDetail);
   }
 
   return response.json();
