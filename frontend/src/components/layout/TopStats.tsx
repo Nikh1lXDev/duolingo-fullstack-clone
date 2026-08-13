@@ -15,7 +15,7 @@ export function TopStats({ streak, xp, hearts, gems, className }: TopStatsProps)
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 flex h-16 w-full items-center justify-between bg-white px-4 lg:px-8",
+        "sticky top-0 z-40 flex h-16 w-full items-center justify-between bg-[#131f24] border-b border-[#2b3d47] px-4 lg:px-8",
         className
       )}
     >

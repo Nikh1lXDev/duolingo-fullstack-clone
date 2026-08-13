@@ -4,6 +4,7 @@ import * as React from "react";
 import { api } from "@/lib/api";
 import { LearningPath as LearningPathType } from "@/types/api";
 import { LearningPath } from "./LearningPath";
+import { RightDashboard } from "@/components/layout/RightDashboard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 
@@ -33,13 +34,14 @@ export function LearningPathContainer() {
 
   if (loading) {
     return (
-      <div className="flex flex-col w-full gap-8 pb-12 animate-pulse">
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-24 w-full" />
-        <div className="flex flex-col items-center gap-8 py-8">
-          <Skeleton className="h-20 w-20 rounded-full" />
-          <Skeleton className="h-20 w-20 rounded-full" />
-          <Skeleton className="h-20 w-20 rounded-full" />
+      <div className="flex flex-col lg:flex-row gap-8 w-full pb-12 animate-pulse">
+        <div className="flex-1 space-y-6">
+          <Skeleton className="h-64 w-full bg-[#182830] rounded-3xl" />
+          <Skeleton className="h-48 w-full bg-[#182830] rounded-3xl" />
+        </div>
+        <div className="hidden lg:block w-80 space-y-6">
+          <Skeleton className="h-56 w-full bg-[#182830] rounded-3xl" />
+          <Skeleton className="h-48 w-full bg-[#182830] rounded-3xl" />
         </div>
       </div>
     );
@@ -55,5 +57,15 @@ export function LearningPathContainer() {
     );
   }
 
-  return <LearningPath data={data} />;
+  return (
+    <div className="flex flex-col lg:flex-row gap-8 w-full items-start">
+      {/* Center Column: Section Cards & Skill Path */}
+      <div className="flex-1 w-full max-w-2xl">
+        <LearningPath data={data} />
+      </div>
+
+      {/* Right Column: Contextual Dashboard Cards */}
+      <RightDashboard course={data.course} />
+    </div>
+  );
 }

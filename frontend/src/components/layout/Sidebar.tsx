@@ -20,9 +20,9 @@ export function Sidebar() {
   const { isAuthenticated, logout } = useAuth();
 
   return (
-    <aside className="hidden h-full flex-col border-r-2 border-[#e5e5e5] bg-white px-4 py-6 md:flex md:w-64 lg:w-72">
-      <Link href="/" className="mb-10 pl-4 transition-opacity hover:opacity-80">
-        <Logo className="h-9 w-auto text-[#58cc02]" />
+    <aside className="hidden h-full flex-col border-r-2 border-[#2b3d47] bg-[#131f24] px-4 py-6 md:flex md:w-64 lg:w-64 shrink-0">
+      <Link href="/" className="mb-8 pl-4 transition-opacity hover:opacity-80 flex items-center gap-2">
+        <Logo className="h-8 w-auto text-[#58cc02]" />
       </Link>
       
       <nav className="flex flex-1 flex-col gap-2">
@@ -36,20 +36,20 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-bold tracking-wide uppercase transition-all",
+                  "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-extrabold tracking-wider uppercase transition-all border-2",
                   isActive 
-                    ? "bg-[#ddf4c5] text-[#1cb0f6] border-2 border-[#84d8ff]" // Duolingo style active state
-                    : "text-[#777777] border-2 border-transparent hover:bg-[#f7f7f7]"
+                    ? "bg-[#182830] text-[#1cb0f6] border-[#1cb0f6]/50 shadow-[0_0_12px_rgba(28,176,246,0.15)]"
+                    : "text-[#afafaf] border-transparent hover:bg-[#182830] hover:text-white"
                 )}
               >
                 <Icon 
                   className={cn(
-                    "h-8 w-8 shrink-0 transition-transform group-hover:scale-110",
+                    "h-7 w-7 shrink-0 transition-transform group-hover:scale-110",
                     isActive ? "text-[#1cb0f6]" : "text-[#afafaf]"
                   )} 
                   strokeWidth={2.5} 
                 />
-                <span className="hidden lg:block">{item.name}</span>
+                <span>{item.name}</span>
               </Link>
             );
           })
@@ -58,49 +58,49 @@ export function Sidebar() {
             <Link
               href="/login"
               className={cn(
-                "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-bold tracking-wide uppercase transition-all",
+                "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-extrabold tracking-wider uppercase transition-all border-2",
                 pathname === "/login" 
-                  ? "bg-[#ddf4c5] text-[#1cb0f6] border-2 border-[#84d8ff]"
-                  : "text-[#777777] border-2 border-transparent hover:bg-[#f7f7f7]"
+                  ? "bg-[#182830] text-[#1cb0f6] border-[#1cb0f6]/50"
+                  : "text-[#afafaf] border-transparent hover:bg-[#182830] hover:text-white"
               )}
             >
-              <LogIn className="h-8 w-8 shrink-0 text-[#afafaf] group-hover:scale-110 transition-transform" strokeWidth={2.5} />
-              <span className="hidden lg:block">LOG IN</span>
+              <LogIn className="h-7 w-7 shrink-0 text-[#afafaf] group-hover:scale-110 transition-transform" strokeWidth={2.5} />
+              <span>LOG IN</span>
             </Link>
             <Link
               href="/signup"
               className={cn(
-                "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-bold tracking-wide uppercase transition-all",
+                "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-extrabold tracking-wider uppercase transition-all border-2",
                 pathname === "/signup" 
-                  ? "bg-[#ddf4c5] text-[#1cb0f6] border-2 border-[#84d8ff]"
-                  : "text-[#777777] border-2 border-transparent hover:bg-[#f7f7f7]"
+                  ? "bg-[#182830] text-[#1cb0f6] border-[#1cb0f6]/50"
+                  : "text-[#afafaf] border-transparent hover:bg-[#182830] hover:text-white"
               )}
             >
-              <UserPlus className="h-8 w-8 shrink-0 text-[#afafaf] group-hover:scale-110 transition-transform" strokeWidth={2.5} />
-              <span className="hidden lg:block">SIGN UP</span>
+              <UserPlus className="h-7 w-7 shrink-0 text-[#afafaf] group-hover:scale-110 transition-transform" strokeWidth={2.5} />
+              <span>SIGN UP</span>
             </Link>
           </>
         )}
       </nav>
 
       {isAuthenticated && (
-        <div className="mt-auto flex flex-col gap-2">
+        <div className="mt-auto flex flex-col gap-2 border-t-2 border-[#2b3d47] pt-4">
           <Link
             href="/settings"
             className={cn(
-              "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-bold tracking-wide uppercase transition-all border-2 border-transparent hover:bg-[#f7f7f7]",
-              pathname === "/settings" ? "bg-[#f7f7f7] text-[#3c3c3c]" : "text-[#777777]"
+              "group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-extrabold tracking-wider uppercase transition-all border-2 border-transparent hover:bg-[#182830]",
+              pathname === "/settings" ? "bg-[#182830] text-[#1cb0f6]" : "text-[#afafaf]"
             )}
           >
-            <Settings className="h-8 w-8 shrink-0 text-[#afafaf] transition-transform group-hover:rotate-90" strokeWidth={2.5} />
-            <span className="hidden lg:block">SETTINGS</span>
+            <Settings className="h-7 w-7 shrink-0 text-[#afafaf] transition-transform group-hover:rotate-90" strokeWidth={2.5} />
+            <span>SETTINGS</span>
           </Link>
           <button
             onClick={logout}
-            className="group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-bold tracking-wide uppercase transition-all border-2 border-transparent hover:bg-[#f7f7f7] text-[#777777]"
+            className="group flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-extrabold tracking-wider uppercase transition-all border-2 border-transparent hover:bg-[#182830] text-[#afafaf] hover:text-[#ff4b4b]"
           >
-            <LogOut className="h-8 w-8 shrink-0 text-[#afafaf] transition-transform group-hover:-translate-x-1" strokeWidth={2.5} />
-            <span className="hidden lg:block">LOGOUT</span>
+            <LogOut className="h-7 w-7 shrink-0 text-[#afafaf] transition-transform group-hover:-translate-x-1" strokeWidth={2.5} />
+            <span>LOGOUT</span>
           </button>
         </div>
       )}
