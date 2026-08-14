@@ -9,14 +9,6 @@ import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure SQLite directory exists before creating tables
-    db_url = settings.DATABASE_URL
-    if db_url.startswith("sqlite:///"):
-        db_path = db_url.replace("sqlite:///", "")
-        db_dir = os.path.dirname(db_path)
-        if db_dir:
-            os.makedirs(db_dir, exist_ok=True)
-            
     # Safely create all tables that do not exist (non-destructive)
     Base.metadata.create_all(bind=engine)
     yield
