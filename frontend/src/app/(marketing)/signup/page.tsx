@@ -47,10 +47,10 @@ export default function SignupPage() {
         username, 
         email, 
         display_name: displayName || username, // fallback
-        password 
+        password
       });
       await refreshUser();
-      router.push("/");
+      router.push("/onboarding/course");
     } catch (err) {
       console.error("Signup failed");
       const error = err as Error;

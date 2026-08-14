@@ -167,6 +167,57 @@ def seed_additional_courses(db: Session):
             ("おとうさん", "father", "family"),
             ("ともだち", "friend", "people"),
         ]),
+        ("English to Spanish", "English", "Spanish", "es_flag.png", [
+            ("hello", "hola", "greetings"),
+            ("thank you", "gracias", "greetings"),
+            ("yes", "sí", "basics"),
+            ("no", "no", "basics"),
+            ("water", "agua", "beverages"),
+            ("apple", "manzana", "food"),
+            ("cat", "gato", "animals"),
+            ("dog", "perro", "animals"),
+            ("book", "libro", "objects"),
+            ("house", "casa", "places"),
+            ("milk", "leche", "beverages"),
+            ("bread", "pan", "food"),
+            ("mother", "madre", "family"),
+            ("father", "padre", "family"),
+            ("friend", "amigo", "people"),
+        ]),
+        ("English to French", "English", "French", "fr_flag.png", [
+            ("hello", "bonjour", "greetings"),
+            ("thank you", "merci", "greetings"),
+            ("yes", "oui", "basics"),
+            ("no", "non", "basics"),
+            ("water", "eau", "beverages"),
+            ("apple", "pomme", "food"),
+            ("cat", "chat", "animals"),
+            ("dog", "chien", "animals"),
+            ("book", "livre", "objects"),
+            ("house", "maison", "places"),
+            ("milk", "lait", "beverages"),
+            ("bread", "pain", "food"),
+            ("mother", "mère", "family"),
+            ("father", "père", "family"),
+            ("friend", "ami", "people"),
+        ]),
+        ("English to German", "English", "German", "de_flag.png", [
+            ("hello", "hallo", "greetings"),
+            ("thank you", "danke", "greetings"),
+            ("yes", "ja", "basics"),
+            ("no", "nein", "basics"),
+            ("water", "wasser", "beverages"),
+            ("apple", "apfel", "food"),
+            ("cat", "katze", "animals"),
+            ("dog", "hund", "animals"),
+            ("book", "buch", "objects"),
+            ("house", "haus", "places"),
+            ("milk", "milch", "beverages"),
+            ("bread", "brot", "food"),
+            ("mother", "mutter", "family"),
+            ("father", "vater", "family"),
+            ("friend", "freund", "people"),
+        ]),
     ]
 
     for name, src, tgt, icon, vlist in additional_courses:
@@ -286,6 +337,21 @@ def seed_data():
             db.add(course)
             db.commit()
             db.refresh(course)
+            
+            # Create settings for demo_learner with onboarding complete
+            demo_settings = UserSettings(
+                user_id=demo_user.id,
+                course_id=course.id,
+                course_language="en",
+                sound_enabled=True,
+                notifications_enabled=True,
+                proficiency_level="new",
+                onboarding_completed=True,
+                placement_completed=False,
+                starting_level="beginner",
+            )
+            db.add(demo_settings)
+            db.commit()
             
             # 3. Units
             unit1 = Unit(course_id=course.id, title="Unit 1", description="Basics & Greetings", order_index=1, is_locked=False)

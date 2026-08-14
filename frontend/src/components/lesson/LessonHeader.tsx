@@ -3,7 +3,6 @@
 import * as React from "react";
 import { X, Heart } from "lucide-react";
 import { IconButton } from "@/components/ui/IconButton";
-import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
@@ -11,9 +10,10 @@ import { useRouter } from "next/navigation";
 export interface LessonHeaderProps {
   progress: number;
   hearts: number | null;
+  accentColor?: string; // Theme accent color
 }
 
-export function LessonHeader({ progress, hearts }: LessonHeaderProps) {
+export function LessonHeader({ progress, hearts, accentColor = "#58cc02" }: LessonHeaderProps) {
   const router = useRouter();
   const [showExitConfirm, setShowExitConfirm] = React.useState(false);
 
@@ -29,14 +29,26 @@ export function LessonHeader({ progress, hearts }: LessonHeaderProps) {
           <X className="h-6 w-6 text-[#afafaf]" />
         </IconButton>
         
-        <div className="mx-4 flex-1">
-          <ProgressBar value={progress} max={100} color="brand" className="h-4" />
+        {/* Themed progress bar */}
+        <div className="mx-4 flex-1 h-4 bg-[#f0f0f0] rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: `${Math.max(0, Math.min(100, progress))}%`,
+              backgroundColor: accentColor,
+            }}
+          />
         </div>
 
-        <div className="flex items-center gap-2 text-[#ff4b4b] font-bold">
-          <Heart className="h-6 w-6 fill-current" />
-          <span>{hearts !== null ? hearts : "..."}</span>
-        </div>
+        {hearts !== null ? (
+          <div className="flex items-center gap-2 text-[#ff4b4b] font-bold">
+            <Heart className="h-6 w-6 fill-current" />
+            <span>{hearts}</span>
+          </div>
+        ) : (
+          // Placement mode — no hearts display
+          <div className="w-10" />
+        )}
       </header>
 
       <Modal
@@ -52,7 +64,7 @@ export function LessonHeader({ progress, hearts }: LessonHeaderProps) {
             <Button size="lg" className="w-full" onClick={() => setShowExitConfirm(false)}>
               STAY
             </Button>
-            <Button size="lg" variant="danger" className="w-full" onClick={() => router.push("/")}>
+            <Button size="lg" variant="danger" className="w-full" onClick={() => router.push("/learn")}>
               QUIT
             </Button>
           </div>

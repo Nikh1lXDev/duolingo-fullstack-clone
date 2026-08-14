@@ -21,6 +21,7 @@ export interface User {
   email: string;
   display_name: string | null;
   avatar: string | null;
+  settings?: UserSettings;
   created_at: string;
   stats?: UserStats;
 }
@@ -34,6 +35,7 @@ export interface Course {
   description: string | null;
   icon: string | null;
   is_active: boolean;
+  units?: Unit[];
   created_at: string;
 }
 
@@ -169,12 +171,24 @@ export interface UserSettings {
   sound_enabled: boolean;
   notifications_enabled: boolean;
   course_language: string;
-  course_id?: number;
+  course_id: number | null;
+  proficiency_level?: string;
+  onboarding_completed: boolean;
+  placement_completed: boolean;
+  placement_score?: number;
+  starting_level?: string;
+  avatar_config?: string | null; // JSON string: {skinTone, hair, eyes, ...}
 }
 
 export interface UserSettingsUpdate {
-  sound_enabled: boolean;
-  notifications_enabled: boolean;
-  course_language: string;
-  course_id?: number;
+  sound_enabled?: boolean;
+  notifications_enabled?: boolean;
+  course_language?: string;
+  course_id?: number | null;
+  proficiency_level?: string;
+  onboarding_completed?: boolean;
+  placement_completed?: boolean;
+  placement_score?: number;
+  starting_level?: string;
+  avatar_config?: string | null; // JSON string
 }

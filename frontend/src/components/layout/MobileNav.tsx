@@ -7,7 +7,7 @@ import { Home, Shield, Target, User, LogIn, UserPlus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-  { name: "Learn", href: "/", icon: Home },
+  { name: "Learn", href: "/learn", icon: Home },
   { name: "Leaderboard", href: "/leaderboard", icon: Shield },
   { name: "Quests", href: "/quests", icon: Target },
   { name: "Profile", href: "/profile", icon: User },

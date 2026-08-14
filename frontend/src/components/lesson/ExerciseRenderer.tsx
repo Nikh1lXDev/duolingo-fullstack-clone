@@ -6,28 +6,31 @@ import { FillBlankExercise } from "./exercises/FillBlankExercise";
 import { TranslateExercise } from "./exercises/TranslateExercise";
 import { WordBankExercise } from "./exercises/WordBankExercise";
 import { MatchPairsExercise } from "./exercises/MatchPairsExercise";
+import type { LessonTheme } from "@/lib/lessonThemes";
 
 export interface ExerciseRendererProps {
   exercise: Exercise;
   submitted: boolean;
   onAnswerSelected: (answer: unknown) => void;
   onSubmit: () => void;
+  theme?: LessonTheme;
 }
 
-export function ExerciseRenderer({ exercise, submitted, onAnswerSelected, onSubmit }: ExerciseRendererProps) {
+export function ExerciseRenderer({ exercise, submitted, onAnswerSelected, onSubmit, theme }: ExerciseRendererProps) {
+  const props = { exercise, submitted, onAnswerSelected, onSubmit, theme };
   switch (exercise.type) {
     case "multiple_choice":
-      return <MultipleChoiceExercise exercise={exercise} submitted={submitted} onAnswerSelected={onAnswerSelected} onSubmit={onSubmit} />;
+      return <MultipleChoiceExercise {...props} />;
     case "type_answer":
-      return <TypeAnswerExercise exercise={exercise} submitted={submitted} onAnswerSelected={onAnswerSelected} onSubmit={onSubmit} />;
+      return <TypeAnswerExercise {...props} />;
     case "fill_blank":
-      return <FillBlankExercise exercise={exercise} submitted={submitted} onAnswerSelected={onAnswerSelected} onSubmit={onSubmit} />;
+      return <FillBlankExercise {...props} />;
     case "translate":
-      return <TranslateExercise exercise={exercise} submitted={submitted} onAnswerSelected={onAnswerSelected} onSubmit={onSubmit} />;
+      return <TranslateExercise {...props} />;
     case "word_bank":
-      return <WordBankExercise exercise={exercise} submitted={submitted} onAnswerSelected={onAnswerSelected} onSubmit={onSubmit} />;
+      return <WordBankExercise {...props} />;
     case "match_pairs":
-      return <MatchPairsExercise exercise={exercise} submitted={submitted} onAnswerSelected={onAnswerSelected} onSubmit={onSubmit} />;
+      return <MatchPairsExercise {...props} />;
     default:
       return <div className="p-8 text-center text-[#ff4b4b]">Unknown exercise type: {exercise.type}</div>;
   }

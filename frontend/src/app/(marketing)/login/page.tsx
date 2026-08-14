@@ -28,9 +28,15 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await api.login({ username: identifier, password });
+      const user = await api.login({ username: identifier, password });
       await refreshUser();
-      router.push("/");
+      
+      // Determine redirect based on onboarding status
+      if (user?.settings?.onboarding_completed) {
+        router.push("/learn");
+      } else {
+        router.push("/onboarding/course");
+      }
     } catch {
       console.error("Login failed");
       setError("Incorrect username/email or password.");

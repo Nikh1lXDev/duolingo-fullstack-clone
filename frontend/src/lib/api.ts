@@ -41,7 +41,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  register: (data: Record<string, string>) => 
+  register: (data: Record<string, unknown>) => 
     fetcher<User>(`/auth/register`, {
       method: "POST",
       body: JSON.stringify(data),

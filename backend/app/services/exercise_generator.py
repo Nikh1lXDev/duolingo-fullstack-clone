@@ -62,11 +62,14 @@ def generate_exercises_for_lesson(
     seed: Optional[int] = None
 ) -> List[Exercise]:
     """
-    Dynamically generates or maps exercises for a lesson based on course language configuration,
+    Dynamically generates exercises for a lesson based on course language configuration,
     vocabulary data model, exercise types, and exercise directions.
+    
+    Uses a per-call Random instance (not global state) so concurrent requests
+    don't interfere. Without a seed, generates a fresh random order each call.
     """
-    if seed is not None:
-        random.seed(seed)
+    # Per-call random instance — doesn't affect global random state
+    rng = random.Random(seed)  # seed=None → truly random per call
 
     skill = lesson.skill
     course = skill.unit.course if (skill and skill.unit) else None
@@ -87,11 +90,26 @@ def generate_exercises_for_lesson(
 
     generated_exercises = []
     
-    # We generate 6 standard exercise types per lesson dynamically
-    e_types = ["multiple_choice", "translate", "word_bank", "match_pairs", "fill_blank", "type_answer"]
+    # Shuffle vocabulary for this call to vary question order per lesson attempt
+    shuffled_vocab = list(vocab_list)
+    rng.shuffle(shuffled_vocab)
+    
+    # Exercise types — randomize order too for variety
+    e_types_pool = ["multiple_choice", "translate", "word_bank", "match_pairs", "fill_blank", "type_answer"]
+    rng.shuffle(e_types_pool)
+    e_types = e_types_pool[:6]  # cap at 6
+    
+    # Track used vocab items to avoid duplicates
+    used_indices: set = set()
     
     for idx, etype in enumerate(e_types, start=1):
-        item = vocab_list[(idx - 1) % len(vocab_list)]
+        # Pick vocab item, cycling through without repeating if possible
+        vocab_idx = (idx - 1) % len(shuffled_vocab)
+        if vocab_idx in used_indices and len(shuffled_vocab) > len(e_types):
+            vocab_idx = (vocab_idx + 1) % len(shuffled_vocab)
+        used_indices.add(vocab_idx)
+        item = shuffled_vocab[vocab_idx]
+        
         direction = "source_to_target" if (idx % 2 != 0) else "target_to_source"
 
         if etype == "multiple_choice":
@@ -101,18 +119,18 @@ def generate_exercises_for_lesson(
                 # Distractors in target language
                 distractor_pool = [v.target_text for v in all_course_vocab if v.target_text != correct]
                 distractor_pool = list(set(distractor_pool))
-                distractors = random.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["water", "house"]
+                distractors = rng.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["water", "house"]
                 opts = [correct] + distractors
-                random.shuffle(opts)
+                rng.shuffle(opts)
             else:
                 prompt = f"Which word means '{item.target_text}'?"
                 correct = item.source_text
                 # Distractors in source language
                 distractor_pool = [v.source_text for v in all_course_vocab if v.source_text != correct]
                 distractor_pool = list(set(distractor_pool))
-                distractors = random.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["gato", "perro"]
+                distractors = rng.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["gato", "perro"]
                 opts = [correct] + distractors
-                random.shuffle(opts)
+                rng.shuffle(opts)
 
             ex = Exercise(
                 id=1000 + idx,
@@ -158,9 +176,9 @@ def generate_exercises_for_lesson(
                     if v.target_text != item.target_text:
                         distractor_pool.extend(v.target_text.split(" "))
                 distractor_pool = list(set([w for w in distractor_pool if w not in words]))
-                distractors = random.sample(distractor_pool, min(3, len(distractor_pool))) if distractor_pool else ["the", "a", "is"]
+                distractors = rng.sample(distractor_pool, min(3, len(distractor_pool))) if distractor_pool else ["the", "a", "is"]
                 opts = words + distractors
-                random.shuffle(opts)
+                rng.shuffle(opts)
             else:
                 prompt = f"Translate: '{item.target_text}'"
                 correct = item.source_text
@@ -170,9 +188,9 @@ def generate_exercises_for_lesson(
                     if v.source_text != item.source_text:
                         distractor_pool.extend(v.source_text.split(" "))
                 distractor_pool = list(set([w for w in distractor_pool if w not in words]))
-                distractors = random.sample(distractor_pool, min(3, len(distractor_pool))) if distractor_pool else ["el", "la", "un"]
+                distractors = rng.sample(distractor_pool, min(3, len(distractor_pool))) if distractor_pool else ["el", "la", "un"]
                 opts = words + distractors
-                random.shuffle(opts)
+                rng.shuffle(opts)
 
             ex = Exercise(
                 id=1000 + idx,
@@ -187,7 +205,7 @@ def generate_exercises_for_lesson(
             )
 
         elif etype == "match_pairs":
-            sample_items = random.sample(all_course_vocab, min(4, len(all_course_vocab))) if len(all_course_vocab) >= 4 else all_course_vocab
+            sample_items = rng.sample(all_course_vocab, min(4, len(all_course_vocab))) if len(all_course_vocab) >= 4 else all_course_vocab
             if not sample_items:
                 sample_items = [item]
             
@@ -198,7 +216,7 @@ def generate_exercises_for_lesson(
                 pairs = {v.source_text: v.target_text for v in sample_items}
                 all_words = list(pairs.keys()) + list(pairs.values())
             
-            random.shuffle(all_words)
+            rng.shuffle(all_words)
 
             ex = Exercise(
                 id=1000 + idx,
@@ -218,17 +236,17 @@ def generate_exercises_for_lesson(
                 correct = item.source_text
                 distractor_pool = [v.source_text for v in all_course_vocab if v.source_text != correct]
                 distractor_pool = list(set(distractor_pool))
-                distractors = random.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["gato", "perro"]
+                distractors = rng.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["gato", "perro"]
                 opts = [correct] + distractors
-                random.shuffle(opts)
+                rng.shuffle(opts)
             else:
                 prompt = f"___ means '{item.source_text}'."
                 correct = item.target_text
                 distractor_pool = [v.target_text for v in all_course_vocab if v.target_text != correct]
                 distractor_pool = list(set(distractor_pool))
-                distractors = random.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["cat", "dog"]
+                distractors = rng.sample(distractor_pool, min(2, len(distractor_pool))) if distractor_pool else ["cat", "dog"]
                 opts = [correct] + distractors
-                random.shuffle(opts)
+                rng.shuffle(opts)
 
             ex = Exercise(
                 id=1000 + idx,

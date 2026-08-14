@@ -3,15 +3,18 @@
 import * as React from "react";
 import { Exercise } from "@/types/api";
 import { Button } from "@/components/ui/Button";
+import { QuestionOption } from "@/components/ui/QuestionOption";
+import type { LessonTheme } from "@/lib/lessonThemes";
 
 export interface ExerciseProps {
   exercise: Exercise;
   submitted: boolean;
   onAnswerSelected: (answer: string) => void;
   onSubmit: () => void;
+  theme?: LessonTheme;
 }
 
-export function MultipleChoiceExercise({ exercise, submitted, onAnswerSelected, onSubmit }: ExerciseProps) {
+export function MultipleChoiceExercise({ exercise, submitted, onAnswerSelected, onSubmit, theme }: ExerciseProps) {
   const [selected, setSelected] = React.useState<string | null>(null);
 
   let options: string[] = [];
@@ -28,29 +31,35 @@ export function MultipleChoiceExercise({ exercise, submitted, onAnswerSelected, 
   };
 
   return (
-    <div className="flex w-full flex-col gap-8 max-w-2xl mx-auto py-8">
+    <div className="flex w-full flex-col gap-8 max-w-2xl mx-auto py-4">
       <h2 className="text-2xl font-bold text-[#3c3c3c]">{exercise.prompt}</h2>
       
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {options.map((option, idx) => (
-          <button
-            key={idx}
-            type="button"
-            disabled={submitted}
-            onClick={() => handleSelect(option)}
-            className={`flex min-h-[60px] w-full items-center justify-center rounded-2xl border-2 p-4 text-lg font-bold transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#1cb0f6]
-              ${
-                selected === option
-                  ? "border-[#1cb0f6] bg-[#ddf4c5] text-[#1cb0f6]"
-                  : "border-[#e5e5e5] bg-white text-[#3c3c3c] hover:bg-[#f7f7f7]"
-              }
-              ${submitted ? "cursor-not-allowed opacity-80" : "cursor-pointer active:translate-y-1"}
-            `}
-            aria-pressed={selected === option}
-          >
-            {option}
-          </button>
-        ))}
+        {options.map((option, idx) => {
+          let state: "default" | "selected" | "correct" | "incorrect" | "disabled" = "default";
+          
+          if (submitted) {
+            if (option === exercise.correct_answer) state = "correct";
+            else if (option === selected) state = "incorrect";
+            else state = "disabled";
+          } else {
+            if (option === selected) state = "selected";
+          }
+
+          return (
+            <QuestionOption
+              key={idx}
+              index={idx + 1}
+              state={state}
+              variant="light"
+              onClick={() => handleSelect(option)}
+              disabled={submitted}
+              className="min-h-[70px] justify-start"
+            >
+              {option}
+            </QuestionOption>
+          );
+        })}
       </div>
 
       <div className="mt-8 flex justify-center">
@@ -59,6 +68,7 @@ export function MultipleChoiceExercise({ exercise, submitted, onAnswerSelected, 
           onClick={onSubmit} 
           disabled={!selected || submitted}
           className="w-full sm:w-1/2"
+          style={theme ? { backgroundColor: theme.accent, borderColor: theme.accentDark } : undefined}
         >
           CHECK
         </Button>
@@ -66,3 +76,4 @@ export function MultipleChoiceExercise({ exercise, submitted, onAnswerSelected, 
     </div>
   );
 }
+

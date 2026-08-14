@@ -29,6 +29,15 @@ class UserSettings(Base):
     notifications_enabled = Column(Boolean, default=True)
     course_language = Column(String, default="es")
     course_id = Column(Integer, ForeignKey("courses.id", ondelete="SET NULL"), nullable=True)
+    
+    # Onboarding and Placement metadata
+    proficiency_level = Column(String, nullable=True)
+    onboarding_completed = Column(Boolean, default=False)
+    placement_completed = Column(Boolean, default=False)
+    placement_score = Column(Integer, nullable=True)
+    starting_level = Column(String, nullable=True)
+    avatar_config = Column(String, nullable=True)  # JSON string: {skinTone, hair, eyes, ...}
+
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

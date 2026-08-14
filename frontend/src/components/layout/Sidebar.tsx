@@ -8,7 +8,7 @@ import { Logo } from "@/components/illustrations/Logo";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-  { name: "LEARN", href: "/", icon: Home },
+  { name: "LEARN", href: "/learn", icon: Home },
   { name: "LEADERBOARD", href: "/leaderboard", icon: Shield },
   { name: "QUESTS", href: "/quests", icon: Target },
   { name: "SHOP", href: "/shop", icon: Store },

@@ -6,10 +6,13 @@ class AuthRegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=128)
     display_name: Optional[str] = None
+    initial_course_id: Optional[int] = None
 
 class AuthLoginRequest(BaseModel):
     username: str
     password: str
+
+from app.schemas.settings import UserSettingsResponse
 
 class AuthUserResponse(BaseModel):
     id: int
@@ -17,3 +20,7 @@ class AuthUserResponse(BaseModel):
     email: str
     display_name: Optional[str] = None
     avatar: Optional[str] = None
+    settings: Optional[UserSettingsResponse] = None
+
+    class Config:
+        from_attributes = True

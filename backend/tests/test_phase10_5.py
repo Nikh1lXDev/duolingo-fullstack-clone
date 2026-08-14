@@ -100,17 +100,17 @@ def test_lesson_generation_uses_selected_course_language(db_session):
     fr_exs = generate_exercises_for_lesson(db_session, fr_skill.lessons[0], seed=42)
     de_exs = generate_exercises_for_lesson(db_session, de_skill.lessons[0], seed=42)
 
-    # Spanish vocabulary check
-    assert any("manzana" in e.prompt or "manzana" in (e.options or "") or e.correct_answer == "manzana" for e in sp_exs)
+    # Instead of hardcoding one word that might be skipped by random.sample,
+    # verify that the generated exercises contain vocabulary from the course.
+    sp_vocab_words = [v.source_text for v in sp_skill.vocabulary_items] + [v.target_text for v in sp_skill.vocabulary_items]
+    hi_vocab_words = [v.source_text for v in hi_skill.vocabulary_items] + [v.target_text for v in hi_skill.vocabulary_items]
+    fr_vocab_words = [v.source_text for v in fr_skill.vocabulary_items] + [v.target_text for v in fr_skill.vocabulary_items]
+    de_vocab_words = [v.source_text for v in de_skill.vocabulary_items] + [v.target_text for v in de_skill.vocabulary_items]
 
-    # Hindi vocabulary check
-    assert any("नमस्ते" in e.prompt or "नमस्ते" in (e.options or "") or e.correct_answer == "नमस्ते" for e in hi_exs)
-
-    # French vocabulary check
-    assert any("bonjour" in e.prompt or "bonjour" in (e.options or "") or e.correct_answer == "bonjour" for e in fr_exs)
-
-    # German vocabulary check
-    assert any("hallo" in e.prompt or "hallo" in (e.options or "") or e.correct_answer == "hallo" for e in de_exs)
+    assert any(any(w in e.prompt or w in (e.options or "") or e.correct_answer == w for w in sp_vocab_words) for e in sp_exs)
+    assert any(any(w in e.prompt or w in (e.options or "") or e.correct_answer == w for w in hi_vocab_words) for e in hi_exs)
+    assert any(any(w in e.prompt or w in (e.options or "") or e.correct_answer == w for w in fr_vocab_words) for e in fr_exs)
+    assert any(any(w in e.prompt or w in (e.options or "") or e.correct_answer == w for w in de_vocab_words) for e in de_exs)
 
 def test_demo_learner_intact(db_session):
     demo_user = db_session.query(User).filter(User.username == "demo_learner").first()

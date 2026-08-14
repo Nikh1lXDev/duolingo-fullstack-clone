@@ -67,7 +67,7 @@ def register_user(db: Session, req: AuthRegisterRequest) -> User:
             user_id=new_user.id,
             sound_enabled=True,
             notifications_enabled=True,
-            course_language="es"
+            course_id=req.initial_course_id
         )
         db.add(new_settings)
         
