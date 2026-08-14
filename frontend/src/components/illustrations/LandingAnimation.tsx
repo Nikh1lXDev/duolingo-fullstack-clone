@@ -19,8 +19,11 @@ export function LandingAnimation() {
   const shouldReduce = useReducedMotion();
 
   const duration = shouldReduce ? 0 : 1;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const idleAnim: any = shouldReduce ? {} : { y: [0, -6, 0], transition: { repeat: Infinity, duration: 3, ease: "easeInOut" } };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const idleAnimSlow: any = shouldReduce ? {} : { y: [0, -4, 0], transition: { repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.5 } };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const idleAnimFast: any = shouldReduce ? {} : { y: [0, -8, 0], transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 1 } };
 
   return (

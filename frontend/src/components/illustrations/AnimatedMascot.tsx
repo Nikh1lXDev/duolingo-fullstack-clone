@@ -36,6 +36,7 @@ export function AnimatedMascot({ state = "idle", className = "", size = 120 }: A
   const shouldReduce = useReducedMotion();
 
   // --- Body animation variants ---
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bodyVariants: Record<MascotState, any> = {
     idle: shouldReduce
       ? { y: 0 }
