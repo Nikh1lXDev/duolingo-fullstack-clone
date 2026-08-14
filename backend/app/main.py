@@ -15,8 +15,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
 
-# Parse comma-separated CORS origins from settings
-origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
+# Parse comma-separated CORS origins from settings, stripping trailing slashes for robustness
+origins = [origin.strip().rstrip("/") for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,
